@@ -37,8 +37,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import { STATUS_CODE } from "../enums/statusCode";
-import authRepository from "../repositories/authRepository";
+import { STATUS_CODE } from "../enums/statusCode.js";
+import authRepository from "../repositories/authRepository.js";
 dotenv.config();
 function allowSignUp(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
@@ -50,7 +50,7 @@ function allowSignUp(req, res, next) {
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, authRepository.getEmail(newUser.email)];
+                    return [4 /*yield*/, authRepository.getUser(newUser.email, "email")];
                 case 2:
                     user = _a.sent();
                     if (user.rows[0]) {
@@ -75,11 +75,11 @@ function allowSignIn(req, res, next) {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    _a = req.body, email = _a.email, password = _a.password;
+                    _a = res.locals.user, email = _a.email, password = _a.password;
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 4, , 5]);
-                    return [4 /*yield*/, authRepository.getUser(email)];
+                    return [4 /*yield*/, authRepository.getUser(email, "email")];
                 case 2:
                     user = _b.sent();
                     if (!user.rows[0]) {
@@ -92,8 +92,10 @@ function allowSignIn(req, res, next) {
                     return [4 /*yield*/, authRepository.getSession(email, "email")];
                 case 3:
                     session = _b.sent();
-                    if (session.rows[0].closedAt) {
-                        return [2 /*return*/, res.sendStatus(STATUS_CODE.UNAUTHORIZED)];
+                    if (session.rows[0]) {
+                        if (session.rows[0].closedAt === null) {
+                            return [2 /*return*/, res.sendStatus(STATUS_CODE.UNAUTHORIZED)];
+                        }
                     }
                     res.locals.newSession = {
                         userId: user.rows[0].id,
@@ -128,11 +130,11 @@ function authorize(req, res, next) {
                     return [4 /*yield*/, authRepository.getSession(token, "token")];
                 case 2:
                     session = _a.sent();
-                    if (!session.rows[0]) {
+                    if (!session.rows[0] || session.rows[0].closedAt) {
                         return [2 /*return*/, res.sendStatus(STATUS_CODE.UNAUTHORIZED)];
                     }
                     try {
-                        jwt.verify(token, process.env.TOKEN_SECRET).userId;
+                        jwt.verify(token, process.env.TOKEN_SECRET);
                     }
                     catch (error) {
                         console.log(error.message);

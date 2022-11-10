@@ -1,8 +1,9 @@
-import Joi, { string } from "joi";
+import Joi from "joi";
 import { joiPasswordExtendCore } from "joi-password";
 import { Request, Response, NextFunction } from "express";
-import { NewUser } from "../protocols/NewUser.js";
+import { NewUser } from "../protocols/User.js";
 import { SignIn } from "../protocols/SignIn.js";
+import { Recipe } from "../protocols/Recipe.js";
 import { STATUS_CODE } from "../enums/statusCode.js";
 
 const JoiPassword = Joi.extend(joiPasswordExtendCore);
@@ -51,12 +52,44 @@ function signInSchema(req: Request, res: Response, next: NextFunction) {
         return res.status(STATUS_CODE.UNPROCESSABLE_ENTITY).send(errors);
     }
 
-    res.locals.newUser = user;
+    res.locals.user = user;
+    
+    next();
+}
+
+function newRecipeSchema(req: Request, res: Response, next: NextFunction) {
+    const newRecipe = req.body as Recipe;
+    const schema = Joi.object({
+        name: Joi.string().min(1).max(50).required(),
+        serves: Joi.number().min(1).required(),
+        prepTime: Joi.number().min(1).required(), //min
+        method: Joi.string().min(1).required(),
+        image: Joi.string(),
+        category: Joi.array().items(Joi.number().required()).required(),
+        ingredients: Joi.array().items(Joi.object({
+            name: Joi.string().min(1).required(), 
+            quantity: Joi.string().allow(null,'')
+        })).required(),
+        by: Joi.object({
+            id: Joi.number().min(1).required(),
+            name: Joi.string().min(1).max(50).required()
+        }).required()
+    });
+
+    const validation = schema.validate(newRecipe, { abortEarly: false });
+
+    if (validation.error) {
+        const errors = validation.error.details.map((detail) => detail.message);
+        return res.status(STATUS_CODE.UNPROCESSABLE_ENTITY).send(errors);
+    }
+
+    res.locals.newRecipe = newRecipe;
     
     next();
 }
 
 export default {
     newUserSchema,
-    signInSchema
+    signInSchema,
+    newRecipeSchema
 };

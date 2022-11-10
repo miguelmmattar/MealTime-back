@@ -2,19 +2,15 @@ import connection from "../database/Postgres.js";
 import bcrypt from "bcrypt";
 import { Session } from "../protocols/session.js";
 
-function getEmail(email: string) {
-    return connection.query(`
-    SELECT
-        id,
-        name, 
-        email,
-        "password" 
-    FROM users 
-        WHERE email = $1;
-`, [email]);
-}
+function getUser(info: string | number, type: string) {
+    let filter: string;
+    
+    if(type === "email") {
+        filter = "WHERE email = $1";
+    } else {
+        filter = "WHERE userId = $1";
+    }
 
-function getUser(email: string) {
     return connection.query(`
     SELECT
         id,
@@ -22,8 +18,8 @@ function getUser(email: string) {
         email,
         "password" 
     FROM users 
-        WHERE email = $1;
-`, [email]);
+        ${filter};
+`, [info]);
 }
 
 function getSession(info: string, type: string) {
@@ -71,7 +67,6 @@ function closeSession(token: string) {
 }
 
 export default {
-    getEmail,
     getUser,
     getSession,
     postNewUser,

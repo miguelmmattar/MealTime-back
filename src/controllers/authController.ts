@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { NewUser } from "../protocols/NewUser.js";
+import { NewUser } from "../protocols/User.js";
 import { Session } from "../protocols/session.js";
 import authRepository from "../repositories/authRepository.js";
 import { STATUS_CODE } from "../enums/statusCode.js";
@@ -7,7 +7,6 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 
 dotenv.config();
-
 
 async function signUp(req: Request, res: Response) {
     const { name, email, password } = res.locals.newUser as NewUser;

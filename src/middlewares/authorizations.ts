@@ -2,19 +2,20 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { Request, Response, NextFunction } from "express";
-import { NewUser } from "../protocols/NewUser.js";
+import { NewUser, User } from "../protocols/User.js";
 import { SignIn } from "../protocols/SignIn.js";
-import { Session } from "../protocols/session.js";
+import { Session, SessionEntity } from "../protocols/session.js";
 import { STATUS_CODE } from "../enums/statusCode.js";
 import authRepository from "../repositories/authRepository.js";
+import { QueryResult } from "pg";
 
 dotenv.config();
 
 async function allowSignUp(req: Request, res: Response, next: NextFunction) {
-    const newUser = req.body as NewUser;
+    const newUser = res.locals.newUser as NewUser;
 
     try {
-        const user = await authRepository.getEmail(newUser.email);
+        const user: QueryResult<User> = await authRepository.getUser(newUser.email, "email");
         if(user.rows[0]) {
             return res.sendStatus(STATUS_CODE.CONFLICT);     
        }
@@ -28,10 +29,10 @@ async function allowSignUp(req: Request, res: Response, next: NextFunction) {
 }
 
 async function allowSignIn(req: Request, res: Response, next: NextFunction) {
-    const { email, password } = req.body as SignIn;
+    const { email, password } = res.locals.user as SignIn;
 
     try {
-        const user = await authRepository.getUser(email);
+        const user: QueryResult<User> = await authRepository.getUser(email, "email");
         
         if(!user.rows[0]) {
             return res.sendStatus(STATUS_CODE.UNAUTHORIZED);
@@ -43,7 +44,7 @@ async function allowSignIn(req: Request, res: Response, next: NextFunction) {
             return res.sendStatus(STATUS_CODE.UNAUTHORIZED);
         }
 
-        const session = await authRepository.getSession(email, "email");
+        const session: QueryResult<SessionEntity> = await authRepository.getSession(email, "email");
 
         if(session.rows[0]) { 
             if(session.rows[0].closedAt === null) { 
@@ -73,14 +74,14 @@ async function authorize(req: Request, res: Response, next: NextFunction) {
             return res.sendStatus(STATUS_CODE.UNAUTHORIZED);
         }
 
-        const session = await authRepository.getSession(token, "token");
+        const session: QueryResult<SessionEntity> = await authRepository.getSession(token, "token");
 
         if(!session.rows[0] || session.rows[0].closedAt) {
             return res.sendStatus(STATUS_CODE.UNAUTHORIZED);
         }
 
         try {
-            jwt.verify(token, process.env.TOKEN_SECRET).userId;
+            jwt.verify(token, process.env.TOKEN_SECRET);
         } catch(error) {
             console.log(error.message);
             return res.sendStatus(STATUS_CODE.UNAUTHORIZED);

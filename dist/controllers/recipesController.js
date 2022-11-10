@@ -1,3 +1,14 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,28 +45,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import authRepository from "../repositories/authRepository.js";
 import { STATUS_CODE } from "../enums/statusCode.js";
-import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-dotenv.config();
-function signUp(req, res) {
+import recipeRepository from "../repositories/recipesRepository.js";
+function postNewRecipe(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var _a, name, email, password, error_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var newRecipe, recipeId, recipe, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
-                    _a = res.locals.newUser, name = _a.name, email = _a.email, password = _a.password;
-                    _b.label = 1;
+                    newRecipe = res.locals.newRecipe;
+                    _a.label = 1;
                 case 1:
-                    _b.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, authRepository.postNewUser(name, email, password)];
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, recipeRepository.postRecipe(newRecipe)];
                 case 2:
-                    _b.sent();
-                    res.sendStatus(STATUS_CODE.OK);
+                    recipeId = _a.sent();
+                    recipe = __assign(__assign({}, newRecipe), { id: recipeId });
+                    res.status(STATUS_CODE.OK).send(recipe);
                     return [3 /*break*/, 4];
                 case 3:
-                    error_1 = _b.sent();
+                    error_1 = _a.sent();
                     console.log(error_1.message);
                     return [2 /*return*/, res.sendStatus(STATUS_CODE.SERVER_ERROR)];
                 case 4: return [2 /*return*/];
@@ -63,59 +72,28 @@ function signUp(req, res) {
         });
     });
 }
-function signIn(req, res) {
+function listCategories(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var session, token, error_2;
+        var categories, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    session = res.locals.newSession;
-                    token = jwt.sign({ userId: session.userId }, process.env.TOKEN_SECRET);
-                    session.token = token;
-                    _a.label = 1;
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, recipeRepository.getCategories()];
                 case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, authRepository.postNewSession(session)];
+                    categories = _a.sent();
+                    res.status(STATUS_CODE.OK).send(categories.rows);
+                    return [3 /*break*/, 3];
                 case 2:
-                    _a.sent();
-                    res.status(STATUS_CODE.OK).send(session);
-                    return [3 /*break*/, 4];
-                case 3:
                     error_2 = _a.sent();
                     console.log(error_2.message);
                     return [2 /*return*/, res.sendStatus(STATUS_CODE.SERVER_ERROR)];
-                case 4: return [2 /*return*/];
-            }
-        });
-    });
-}
-function signOut(req, res) {
-    return __awaiter(this, void 0, void 0, function () {
-        var session, error_3;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    session = res.locals.session;
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, authRepository.closeSession(session.token)];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    error_3 = _a.sent();
-                    console.log(error_3.message);
-                    return [2 /*return*/, res.sendStatus(STATUS_CODE.SERVER_ERROR)];
-                case 4:
-                    res.sendStatus(STATUS_CODE.OK);
-                    return [2 /*return*/];
+                case 3: return [2 /*return*/];
             }
         });
     });
 }
 export default {
-    signUp: signUp,
-    signIn: signIn,
-    signOut: signOut
+    postNewRecipe: postNewRecipe,
+    listCategories: listCategories
 };

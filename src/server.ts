@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
 import authRouter from "./routers/authRouter.js"
+import recipesRouter from "./routers/recipesRouter.js"
 
 dotenv.config();
 
@@ -11,7 +12,8 @@ const server = express();
 server
   .use(cors())
   .use(express.json())
-  .use(authRouter);
+  .use(authRouter)
+  .use(recipesRouter);
 
 server.get("/", (req: Request, res: Response) => res.sendStatus(200));
 
