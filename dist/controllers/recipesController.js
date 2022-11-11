@@ -72,9 +72,44 @@ function postNewRecipe(req, res) {
         });
     });
 }
+function listRecipes(req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var categoryId, search, filter, recipes, error_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    categoryId = Number(req.query.category);
+                    search = req.query.search;
+                    filter = {
+                        category: null,
+                        search: null
+                    };
+                    if (categoryId) {
+                        filter.category = categoryId;
+                    }
+                    if (search) {
+                        filter.search = "%".concat(search, "%");
+                    }
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, recipeRepository.getRecipes(filter)];
+                case 2:
+                    recipes = _a.sent();
+                    res.status(STATUS_CODE.OK).send(recipes.rows);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_2 = _a.sent();
+                    console.log(error_2.message);
+                    return [2 /*return*/, res.sendStatus(STATUS_CODE.SERVER_ERROR)];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
 function listCategories(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var categories, error_2;
+        var categories, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -85,8 +120,8 @@ function listCategories(req, res) {
                     res.status(STATUS_CODE.OK).send(categories.rows);
                     return [3 /*break*/, 3];
                 case 2:
-                    error_2 = _a.sent();
-                    console.log(error_2.message);
+                    error_3 = _a.sent();
+                    console.log(error_3.message);
                     return [2 /*return*/, res.sendStatus(STATUS_CODE.SERVER_ERROR)];
                 case 3: return [2 /*return*/];
             }
@@ -95,5 +130,6 @@ function listCategories(req, res) {
 }
 export default {
     postNewRecipe: postNewRecipe,
+    listRecipes: listRecipes,
     listCategories: listCategories
 };

@@ -48,7 +48,10 @@ function newRecipeSchema(req, res, next) {
         prepTime: Joi.number().min(1).required(),
         method: Joi.string().min(1).required(),
         image: Joi.string(),
-        category: Joi.array().items(Joi.number().required()).required(),
+        category: Joi.array().items(Joi.object({
+            id: Joi.number().required(),
+            name: Joi.string().min(1).required()
+        }).required()),
         ingredients: Joi.array().items(Joi.object({
             name: Joi.string().min(1).required(),
             quantity: Joi.string().allow(null, '')

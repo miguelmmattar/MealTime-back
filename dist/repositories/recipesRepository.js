@@ -50,7 +50,7 @@ function postRecipe(recipe) {
                     return [4 /*yield*/, Promise.all(recipe.category.map(function (item) { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0: return [4 /*yield*/, connection.query("\n            INSERT INTO \n                \"recipes/categories\" (\"recipeId\", \"categoryId\")\n            VALUES ($1, $2);  \n        ", [recipeId.rows[0].id, item])];
+                                    case 0: return [4 /*yield*/, connection.query("\n            INSERT INTO \n                \"recipes/categories\" (\"recipeId\", \"categoryId\")\n            VALUES ($1, $2);  \n        ", [recipeId.rows[0].id, item.id])];
                                     case 1:
                                         _a.sent();
                                         return [2 /*return*/, 1];
@@ -96,15 +96,44 @@ function postRecipe(recipe) {
                         }); }))];
                 case 7:
                     _a.sent();
+                    return [4 /*yield*/, connection.query("\n        INSERT INTO\n            images (url, \"recipeId\")\n        VALUES ($1, $2);\n    ", [recipe.image, recipeId.rows[0].id])];
+                case 8:
+                    _a.sent();
                     return [2 /*return*/, recipeId.rows[0].id];
             }
         });
     });
+}
+function getRecipes(filter) {
+    var param;
+    var info;
+    if (filter.category) {
+        param = "WHERE categories.id = $1";
+        info = filter.category;
+    }
+    if (filter.search) {
+        param = "WHERE recipes.name LIKE $1";
+        info = filter.search;
+    }
+    if (filter.category && filter.search) {
+        param = "WHERE categories.id = $1 AND recipes.name LIKE $2";
+    }
+    var baseQuery = "\n        SELECT\n            recipes.id AS id,\n            recipes.name AS name,\n            recipes.serves AS serves,\n            recipes.\"prepTime\" AS \"prepTime\",\n            recipes.method AS method,\n            images.url AS image,\n            json_agg(json_build_object(\n                'id', categories.id,\n                'name', categories.name\n            )) AS category,\n            json_agg(json_build_object(\n                'name', ingredients.name,\n                'quantity', \"recipes/ingredients\".quantity \n            )) AS ingredients,\n            json_build_object(\n                'id', users.id,\n                'name', users.name\n            ) AS by\n        FROM \n            recipes\n        JOIN users\n            ON recipes.\"userId\" = users.id\n        LEFT JOIN images\n            ON recipes.id = images.\"recipeId\"\n        JOIN \"recipes/categories\"\n            ON recipes.id = \"recipes/categories\".\"recipeId\"\n        JOIN categories\n            ON \"recipes/categories\".\"categoryId\" = categories.id\n        JOIN \"recipes/ingredients\"\n            ON recipes.id = \"recipes/ingredients\".\"recipeId\"\n        JOIN ingredients\n            ON \"recipes/ingredients\".\"ingredientId\" = ingredients.id\n    ";
+    if (!param) {
+        var query = "\n        ".concat(baseQuery, " \n        GROUP BY recipes.id, images.url, users.id;\n    ");
+        console.log(query);
+        return connection.query("\n            ".concat(baseQuery, " \n            GROUP BY recipes.id, images.url, users.id;\n        "));
+    }
+    if (filter.category && filter.search) {
+        return connection.query("\n            ".concat(baseQuery, "\n            ").concat(param, "\n            GROUP BY recipes.id, images.url, users.id;\n        "), [filter.category, filter.search]);
+    }
+    return connection.query("\n        ".concat(baseQuery, "\n        ").concat(param, "\n        GROUP BY recipes.id, images.url, users.id;\n    "), [info]);
 }
 function getCategories() {
     return connection.query("\n        SELECT \n            *\n        FROM categories;\n    ");
 }
 export default {
     postRecipe: postRecipe,
+    getRecipes: getRecipes,
     getCategories: getCategories
 };

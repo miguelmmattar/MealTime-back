@@ -5,7 +5,10 @@ export type Recipe = {
     prepTime: number,
     method: string,
     image: string | null,
-    category: number[],
+    category: {
+        id: number,
+        name: string
+    }[],
     ingredients: {
         name: string,
         quantity?: string
