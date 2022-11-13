@@ -6,8 +6,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/server.js",
-    "prebuild": "rm -rf dist",
-    "build": "ttsc -p tsconfig.build.json",
+    "postinstall": "tsc",
+    "watch-node": "nodemon dist/index.js",
+    "watch-ts": "tsc -w",
     "deploy": "git push heroku main"
   },
   "keywords": [],
