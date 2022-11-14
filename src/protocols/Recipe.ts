@@ -20,3 +20,5 @@ export type Recipe = {
 }
 
 export type NewRecipe = Omit<Recipe, "id">
+
+export type RecipeOwner = Pick<Recipe, "id">

@@ -5,8 +5,10 @@ import { Request, Response, NextFunction } from "express";
 import { NewUser, User } from "../protocols/User.js";
 import { SignIn } from "../protocols/SignIn.js";
 import { Session, SessionEntity } from "../protocols/session.js";
+import { RecipeOwner } from "../protocols/Recipe.js";
 import { STATUS_CODE } from "../enums/statusCode.js";
 import authRepository from "../repositories/authRepository.js";
+import recipesRepository from "../repositories/recipesRepository.js";
 import { QueryResult } from "pg";
 
 dotenv.config();
@@ -76,7 +78,11 @@ async function authorize(req: Request, res: Response, next: NextFunction) {
 
         const session: QueryResult<SessionEntity> = await authRepository.getSession(token, "token");
 
-        if(!session.rows[0] || session.rows[0].closedAt) {
+        if(!session.rows[0]) {
+            return res.sendStatus(STATUS_CODE.UNAUTHORIZED);
+        }
+
+        if(session.rows[0].closedAt) {
             return res.sendStatus(STATUS_CODE.UNAUTHORIZED);
         }
 
@@ -87,7 +93,29 @@ async function authorize(req: Request, res: Response, next: NextFunction) {
             return res.sendStatus(STATUS_CODE.UNAUTHORIZED);
         }
         
-        res.locals.session = session.rows[0];
+        res.locals.session = session.rows[0] as SessionEntity;
+    } catch(error) {
+        console.log(error.message);
+        return res.sendStatus(STATUS_CODE.SERVER_ERROR);
+    }
+
+    next();
+}
+
+async function allowDelete(req: Request, res: Response, next: NextFunction) {
+    const userId = Number(res.locals.session.userId);
+    const recipeId = Number(req.params.recipeId);
+
+    try {
+        const recipeOwner: QueryResult<RecipeOwner> = await recipesRepository.getRecipeOwner(recipeId);
+
+        if(!recipeOwner.rows[0]) {
+            return res.sendStatus(STATUS_CODE.NOT_FOUND);
+        }
+
+        if(userId !== recipeOwner.rows[0].id) {
+            return res.sendStatus(STATUS_CODE.UNAUTHORIZED);
+        }
     } catch(error) {
         console.log(error.message);
         return res.sendStatus(STATUS_CODE.SERVER_ERROR);
@@ -99,5 +127,6 @@ async function authorize(req: Request, res: Response, next: NextFunction) {
 export default {
     allowSignUp,
     allowSignIn,
-    authorize
+    authorize,
+    allowDelete
 }

@@ -128,8 +128,33 @@ function listCategories(req, res) {
         });
     });
 }
+function deleteRecipe(req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var recipeId, error_4;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    recipeId = Number(req.params.recipeId);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, recipeRepository.deleteRecipe(recipeId)];
+                case 2:
+                    _a.sent();
+                    res.sendStatus(STATUS_CODE.OK);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_4 = _a.sent();
+                    console.log(error_4.message);
+                    return [2 /*return*/, res.sendStatus(STATUS_CODE.SERVER_ERROR)];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
 export default {
     postNewRecipe: postNewRecipe,
     listRecipes: listRecipes,
-    listCategories: listCategories
+    listCategories: listCategories,
+    deleteRecipe: deleteRecipe
 };

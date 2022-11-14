@@ -39,6 +39,7 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { STATUS_CODE } from "../enums/statusCode.js";
 import authRepository from "../repositories/authRepository.js";
+import recipesRepository from "../repositories/recipesRepository.js";
 dotenv.config();
 function allowSignUp(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
@@ -130,7 +131,10 @@ function authorize(req, res, next) {
                     return [4 /*yield*/, authRepository.getSession(token, "token")];
                 case 2:
                     session = _a.sent();
-                    if (!session.rows[0] || session.rows[0].closedAt) {
+                    if (!session.rows[0]) {
+                        return [2 /*return*/, res.sendStatus(STATUS_CODE.UNAUTHORIZED)];
+                    }
+                    if (session.rows[0].closedAt) {
                         return [2 /*return*/, res.sendStatus(STATUS_CODE.UNAUTHORIZED)];
                     }
                     try {
@@ -153,8 +157,41 @@ function authorize(req, res, next) {
         });
     });
 }
+function allowDelete(req, res, next) {
+    return __awaiter(this, void 0, void 0, function () {
+        var userId, recipeId, recipeOwner, error_4;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    userId = Number(res.locals.session.userId);
+                    recipeId = Number(req.params.recipeId);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, recipesRepository.getRecipeOwner(recipeId)];
+                case 2:
+                    recipeOwner = _a.sent();
+                    if (!recipeOwner.rows[0]) {
+                        return [2 /*return*/, res.sendStatus(STATUS_CODE.NOT_FOUND)];
+                    }
+                    if (userId !== recipeOwner.rows[0].id) {
+                        return [2 /*return*/, res.sendStatus(STATUS_CODE.UNAUTHORIZED)];
+                    }
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_4 = _a.sent();
+                    console.log(error_4.message);
+                    return [2 /*return*/, res.sendStatus(STATUS_CODE.SERVER_ERROR)];
+                case 4:
+                    next();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 export default {
     allowSignUp: allowSignUp,
     allowSignIn: allowSignIn,
-    authorize: authorize
+    authorize: authorize,
+    allowDelete: allowDelete
 };

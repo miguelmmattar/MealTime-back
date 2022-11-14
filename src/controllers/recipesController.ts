@@ -58,8 +58,22 @@ async function listCategories(req: Request, res: Response) {
     }
 }
 
+async function deleteRecipe(req: Request, res: Response) {
+    const recipeId = Number(req.params.recipeId);
+
+    try {
+        await recipeRepository.deleteRecipe(recipeId);
+
+        res.sendStatus(STATUS_CODE.OK);
+    } catch(error) {
+        console.log(error.message);
+        return res.sendStatus(STATUS_CODE.SERVER_ERROR);
+    }
+}
+
 export default {
     postNewRecipe,
     listRecipes,
-    listCategories
+    listCategories,
+    deleteRecipe
 }

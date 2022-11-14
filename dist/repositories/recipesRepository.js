@@ -121,7 +121,6 @@ function getRecipes(filter) {
     var baseQuery = "\n        SELECT\n            recipes.id AS id,\n            recipes.name AS name,\n            recipes.serves AS serves,\n            recipes.\"prepTime\" AS \"prepTime\",\n            recipes.method AS method,\n            images.url AS image,\n            json_agg(json_build_object(\n                'id', categories.id,\n                'name', categories.name\n            )) AS category,\n            json_agg(json_build_object(\n                'name', ingredients.name,\n                'quantity', \"recipes/ingredients\".quantity \n            )) AS ingredients,\n            json_build_object(\n                'id', users.id,\n                'name', users.name\n            ) AS by\n        FROM \n            recipes\n        JOIN users\n            ON recipes.\"userId\" = users.id\n        LEFT JOIN images\n            ON recipes.id = images.\"recipeId\"\n        JOIN \"recipes/categories\"\n            ON recipes.id = \"recipes/categories\".\"recipeId\"\n        JOIN categories\n            ON \"recipes/categories\".\"categoryId\" = categories.id\n        JOIN \"recipes/ingredients\"\n            ON recipes.id = \"recipes/ingredients\".\"recipeId\"\n        JOIN ingredients\n            ON \"recipes/ingredients\".\"ingredientId\" = ingredients.id\n    ";
     if (!param) {
         var query = "\n        ".concat(baseQuery, " \n        GROUP BY recipes.id, images.url, users.id;\n    ");
-        console.log(query);
         return connection.query("\n            ".concat(baseQuery, " \n            GROUP BY recipes.id, images.url, users.id;\n        "));
     }
     if (filter.category && filter.search) {
@@ -132,8 +131,16 @@ function getRecipes(filter) {
 function getCategories() {
     return connection.query("\n        SELECT \n            *\n        FROM categories;\n    ");
 }
+function getRecipeOwner(recipeId) {
+    return connection.query("\n        SELECT \n            \"userId\" AS id\n        FROM recipes\n            WHERE recipes.id = $1;\n    ", [recipeId]);
+}
+function deleteRecipe(recipeId) {
+    return connection.query("\n        DELETE FROM\n            recipes\n        WHERE id = $1;\n    ", [recipeId]);
+}
 export default {
     postRecipe: postRecipe,
     getRecipes: getRecipes,
-    getCategories: getCategories
+    getCategories: getCategories,
+    getRecipeOwner: getRecipeOwner,
+    deleteRecipe: deleteRecipe
 };

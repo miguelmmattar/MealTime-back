@@ -9,6 +9,7 @@ router.use(authorizations.authorize);
 router.post("/recipes", scheemas.newRecipeSchema, recipesController.postNewRecipe);
 router.get("/recipes", recipesController.listRecipes);
 router.get("/categories", recipesController.listCategories);
+router.delete("/recipes/:recipeId", authorizations.allowDelete, recipesController.deleteRecipe);
 
 
 export default router;

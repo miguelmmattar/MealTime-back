@@ -1,11 +1,11 @@
 {
-  "name": "MealTime-back",
+  "name": "mealtime-back",
   "version": "1.0.0",
   "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "nodemon dist/server.js",
     "deploy": "git push heroku main"
   },
   "keywords": [],

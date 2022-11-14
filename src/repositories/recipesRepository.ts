@@ -125,8 +125,6 @@ function getRecipes(filter: Filter) {
         ${baseQuery} 
         GROUP BY recipes.id, images.url, users.id;
     `
-    console.log(query)
-
         return connection.query(`
             ${baseQuery} 
             GROUP BY recipes.id, images.url, users.id;
@@ -157,8 +155,27 @@ function getCategories() {
     `);
 }
 
+function getRecipeOwner(recipeId: number)  {
+    return connection.query(`
+        SELECT 
+            "userId" AS id
+        FROM recipes
+            WHERE recipes.id = $1;
+    `, [recipeId]);
+}
+
+function deleteRecipe(recipeId: number) {
+    return connection.query(`
+        DELETE FROM
+            recipes
+        WHERE id = $1;
+    `, [recipeId]);
+}
+
 export default {
     postRecipe,
     getRecipes,
-    getCategories
+    getCategories,
+    getRecipeOwner,
+    deleteRecipe
 }
