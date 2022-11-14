@@ -6,7 +6,7 @@ Back-end for MealTime, a recipe sharing app.
 
 MealTime is a web browser application on wich you can share your own recipes or find some from the commuitity.
 
-## How to run
+## How to run (locally)
 
 1. Clone this repository
 2. Install all dependencies
