@@ -92,7 +92,7 @@ function getRecipes(filter: Filter) {
             recipes."prepTime" AS "prepTime",
             recipes.method AS method,
             images.url AS image,
-            json_agg(json_build_object(
+            json_agg(DISTINCT jsonb_build_object(
                 'id', categories.id,
                 'name', categories.name
             )) AS category,
