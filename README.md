@@ -42,3 +42,155 @@ You can find a deploy of this app on Heroku (valid until 11/28/2022) at https://
 
 #### Attached data base URI: 
 postgres://vpusihwbpvbaxr:5dc7bf324841db6e2cc427c9aae43870284bba0336b728a5b588b8f78e107eda@ec2-3-229-11-55.compute-1.amazonaws.com:5432/dv5uf3rer02rd
+
+## Features
+
+### POST /sign-up
+
+requires: body
+
+  - body example: 
+  
+   ```
+   {
+      "name": "Jon",
+      "email": "jon@gmail.com",
+      "password": "@123456Ab",
+      "confirmPassword": "@123456Ab"
+   }
+   ```
+status: 
+  ```
+   200 - OK
+   500 - SERVER_ERROR
+   409 - CONFLICT ##E-mail already registered
+   422 - UNPROCESSABLE_ENTITY ##Incorrect entry
+  ```
+
+## 
+
+### POST /sign-in
+
+requires: body
+
+  - body example: 
+  
+   ```
+   {
+      "email": "jon@gmail.com",
+      "password": "@123456Ab"
+   }
+   ```
+returns:   
+
+  - example:
+
+   ```
+   {
+      "id": 1,
+      "token": "AbCdEf123456""
+   }
+   ```
+
+status: 
+  ```
+   200 - OK
+   500 - SERVER_ERROR
+   401 - UNOUTHORIZED ##Incorrect credentials
+   422 - UNPROCESSABLE_ENTITY ##Incorrect entry
+  ```
+
+## 
+
+### PUT /sign-out
+
+requires: header
+
+  - header example: 
+  
+   ```
+   {
+      "Authorization": "Bearer AbCdEf123456"
+   }
+   ```
+returns: 
+  ```
+   200 - OK
+   500 - SERVER_ERROR
+   401 - UNOUTHORIZED ##Incorrect credentials
+  ```
+
+##
+
+### GET /categories
+
+requires: header
+
+  - header example: 
+  
+   ```
+   {
+      "Authorization": "Bearer AbCdEf123456"
+   }
+   ```
+returns: 
+  ```
+   200 - OK
+   500 - SERVER_ERROR
+   401 - UNOUTHORIZED ##Incorrect credentials
+  ```
+
+## 
+
+### GET /recipes
+
+requires: header
+
+  - header example: 
+  
+   ```
+   {
+      "Authorization": "Bearer AbCdEf123456"
+   }
+   ```
+allowes: query (categoryId / search)
+
+  - query examples: 
+  
+   ```
+   ?categoryId=1?
+   ?Search=fish
+   ?categoryId=1?Search=cheese
+   ```
+ 
+status: 
+  ```
+   200 - OK
+   500 - SERVER_ERROR
+   401 - UNOUTHORIZED ##Incorrect credentials
+  ```
+
+## 
+
+### GET /categories
+
+requires: header
+
+  - header example: 
+  
+   ```
+   {
+      "Authorization": "Bearer AbCdEf123456"
+   }
+   ```
+returns: 
+  ```
+   200 - OK
+   500 - SERVER_ERROR
+   401 - UNOUTHORIZED ##Incorrect credentials
+  ```
+
+## 
+   
+   
+ 
