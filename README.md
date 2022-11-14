@@ -36,7 +36,7 @@ npm start
 ```
 Now your application is ready to be run locally!
 
-## Alternative
+## Alternative (deploy)
 
 You can find a deploy of this app on Heroku (valid until 11/28/2022) at https://mealtime-postgres.herokuapp.com/
 
