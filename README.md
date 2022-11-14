@@ -67,7 +67,7 @@ status:
    422 - UNPROCESSABLE_ENTITY ##Incorrect entry
   ```
 
-## 
+##
 
 ### POST /sign-in
 
@@ -81,13 +81,13 @@ requires: body
       "password": "@123456Ab"
    }
    ```
-returns:   
+returns: session  
 
-  - example:
+  - return example:
 
    ```
    {
-      "id": 1,
+      "userId": 1,
       "token": "AbCdEf123456""
    }
    ```
@@ -113,7 +113,7 @@ requires: header
       "Authorization": "Bearer AbCdEf123456"
    }
    ```
-returns: 
+status: 
   ```
    200 - OK
    500 - SERVER_ERROR
@@ -133,7 +133,28 @@ requires: header
       "Authorization": "Bearer AbCdEf123456"
    }
    ```
-returns: 
+returns: categories
+
+- return example:
+
+   ```
+  [
+     {
+       "id": 1,
+       "name": "pasta"
+     },
+     {
+       "id": 2,
+       "name": "chicken"
+     },
+     {
+       "id": 3,
+       "name": "meat"
+     }
+  ]
+   ```
+
+status: 
   ```
    200 - OK
    500 - SERVER_ERROR
@@ -162,8 +183,50 @@ allowes: query (categoryId / search)
    ?Search=fish
    ?categoryId=1?Search=cheese
    ```
+   
+returns: recipe
+
+- return example:
+
+  ```
+  [
+   {
+     "id": 6,
+     "name": "Cup Noodles",
+     "serves": 1,
+     "prepTime": 5,
+     "method": "STEP 1\nBoil water.\n\nSTEP 2\nOpen the lid, without removing it completely.\n\nSTEP 3\nAdd the boiled water.\n\nSTEP 4\nClose the lid and wait 3 minuts.",
+     "image": "https://static.paodeacucar.com/img/uploads/1/116/635116.png",
+     "category": [
+       {
+         "id": 1,
+         "name": "pasta"
+       },
+       {
+         "id": 9,
+         "name": "soup"
+       }
+     ],
+     "ingredients": [
+       {
+         "name": "water",
+         "quantity": "250mL"
+       },
+       {
+         "name": "Cup Noodles",
+         "quantity": "1 unity"
+       }
+     ],
+     "by": {
+       "id": 3,
+       "name": "Mary"
+     }
+   }
+ ]
+ ```
  
 status: 
+
   ```
    200 - OK
    500 - SERVER_ERROR
@@ -172,7 +235,7 @@ status:
 
 ## 
 
-### GET /categories
+### POST /recipes
 
 requires: header
 
@@ -183,14 +246,80 @@ requires: header
       "Authorization": "Bearer AbCdEf123456"
    }
    ```
-returns: 
+returns: recipe
+
+- return example:
+
+   ```
+  [
+  {
+    "id": 6,
+    "name": "Cup Noodles",
+    "serves": 1,
+    "prepTime": 5,
+    "method": "STEP 1\nBoil water.\n\nSTEP 2\nOpen the lid, without removing it completely.\n\nSTEP 3\nAdd the boiled water.\n\nSTEP 4\nClose the lid and wait 3 minuts.",
+    "image": "[https://images.immediate.co.uk/production/volatile/sites/30/2020/08/recipe-image-legacy-id-1001491_11-2e0fa5c.jpg?quality=90&webp=true&resize=300,272](http://cdn.firstwefeast.com/assets/2015/03/cupnoodles.jpg)",
+    "category": [
+      {
+        "id": 1,
+        "name": "pasta"
+      },
+      {
+        "id": 9,
+        "name": "soup"
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "water",
+        "quantity": "250mL"
+      },
+      {
+        "name": "Cup Noodles",
+        "quantity": "1 unity"
+      }
+    ],
+    "by": {
+      "id": 3,
+      "name": "Mary"
+    }
+  }
+]
+   ```
+   
+status: 
+  ```
+   200 - OK
+   500 - SERVER_ERROR
+   401 - UNOUTHORIZED ##Incorrect credentials
+   422 - UNPROCESSABLE_ENTITY ##Incorrect entry
+  ```
+
+## 
+
+### DELETE /recipes/:recipeId
+
+requires: header, params
+
+  - header example: 
+  
+   ```
+   {
+      "Authorization": "Bearer AbCdEf123456"
+   }
+   ```
+   
+   - params example: 
+  
+   ```
+   /33
+   ```
+   
+status: 
   ```
    200 - OK
    500 - SERVER_ERROR
    401 - UNOUTHORIZED ##Incorrect credentials
   ```
 
-## 
-   
-   
- 
+##
