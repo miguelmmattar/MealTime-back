@@ -184,46 +184,18 @@ allowes: query (categoryId / search)
    ?categoryId=1?Search=cheese
    ```
    
-returns: recipe
+returns: recipes array
 
 - return example:
 
   ```
   [
-   {
-     "id": 6,
-     "name": "Cup Noodles",
-     "serves": 1,
-     "prepTime": 5,
-     "method": "STEP 1\nBoil water.\n\nSTEP 2\nOpen the lid, without removing it completely.\n\nSTEP 3\nAdd the boiled water.\n\nSTEP 4\nClose the lid and wait 3 minuts.",
-     "image": "https://static.paodeacucar.com/img/uploads/1/116/635116.png",
-     "category": [
-       {
-         "id": 1,
-         "name": "pasta"
-       },
-       {
-         "id": 9,
-         "name": "soup"
-       }
-     ],
-     "ingredients": [
-       {
-         "name": "water",
-         "quantity": "250mL"
-       },
-       {
-         "name": "Cup Noodles",
-         "quantity": "1 unity"
-       }
-     ],
-     "by": {
-       "id": 3,
-       "name": "Mary"
-     }
-   }
- ]
- ```
+     {recipe 1},
+     {recipe 2},
+     {recipe 3}
+  ]
+ 
+  ```
  
 status: 
 
@@ -251,7 +223,6 @@ returns: recipe
 - return example:
 
    ```
-  [
   {
     "id": 6,
     "name": "Cup Noodles",
@@ -284,7 +255,7 @@ returns: recipe
       "name": "Mary"
     }
   }
-]
+
    ```
    
 status: 
@@ -321,5 +292,3 @@ status:
    500 - SERVER_ERROR
    401 - UNOUTHORIZED ##Incorrect credentials
   ```
-
-##
