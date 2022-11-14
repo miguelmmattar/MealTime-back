@@ -5,8 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon dist/server.js",
-    "deploy": "git push heroku main"
+    "start": "node dist/server.js",
+    "postinstall": "ng build --aot --prod"
   },
   "keywords": [],
   "author": "",
